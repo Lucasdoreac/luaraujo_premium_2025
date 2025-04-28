@@ -77,6 +77,10 @@ Até o momento, foram implementados os seguintes arquivos principais:
 - **auth/login.php**: Página de login
 - **auth/login_process.php**: Processamento do login
 - **auth/register.php**: Página de cadastro
+- **calculadoras/index.php**: Página índice das calculadoras
+- **calculadoras/demo/simulador.php**: Versão demo do simulador educacional
+- **calculadoras/premium/simulador.php**: Versão premium do simulador educacional
+- **api/hotmart_webhook.php**: Endpoint para gerenciamento de licenças via Hotmart
 
 ### Próximos Passos
 
@@ -87,9 +91,9 @@ Até o momento, foram implementados os seguintes arquivos principais:
 
 2. **Fase de Desenvolvimento PHP**
    - [x] Implementar sistema de autenticação leve
-   - [ ] Desenvolver middlewares de verificação de acesso
-   - [ ] Implementar integração Hotmart/Amazon
-   - [ ] Adaptar calculadoras para versões demo e premium
+   - [x] Desenvolver middlewares de verificação de acesso
+   - [ ] Adaptar calculadoras para versões demo e premium (Simulador scaffolded)
+   - [ ] Implementar integração Hotmart/Amazon (Webhook endpoint created)
 
 3. **Fase de Banco de Dados**
    - [x] Criar esquema de banco de dados
@@ -122,6 +126,7 @@ O sistema foi projetado com conformidade LGPD em mente, coletando apenas o míni
 
 ## Atualizações Recentes
 
+- **28/04/2025**: Implementação de calculadoras demo/premium e webhook Hotmart
 - **28/04/2025**: Implementação da estrutura básica do projeto e arquivos principais
 - **27/04/2025**: Criação do repositório e definição da arquitetura
 - **22/04/2025**: Análise das calculadoras originais e planejamento da conversão
@@ -132,7 +137,7 @@ O sistema foi projetado com conformidade LGPD em mente, coletando apenas o míni
 
 Para os próximos passos, o foco deve ser:
 
-1. Adaptar as calculadoras originais para o novo formato (demo/premium)
-2. Implementar a integração com Hotmart para verificação de licenças
-3. Desenvolver a funcionalidade de blog para SEO
-4. Finalizar o sistema de autenticação e perfil de usuário
+1. - [ ] Adaptar calculadoras para versões demo e premium (Simulador scaffolded)
+2. - [ ] Implementar integração Hotmart/Amazon (Webhook endpoint created)
+3. - [ ] Desenvolver a funcionalidade de blog para SEO
+4. - [ ] Finalizar o sistema de autenticação e perfil de usuário
