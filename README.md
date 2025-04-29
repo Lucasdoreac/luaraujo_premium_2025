@@ -19,6 +19,11 @@ Recriação do site luaraujo.com, transformando-o de um modelo de calculadoras g
 ├── assets/
 │   ├── css/                  # CSS consolidado e minificado
 │   ├── js/                   # JavaScript consolidado e minificado
+│   │   └── calculadoras/     # JavaScript específico das calculadoras
+│   │       ├── simulador.js  # Funções do simulador (demo/premium)
+│   │       ├── chart-helpers.js # Funções auxiliares para gráficos
+│   │       ├── pgbl-cdb.js   # Funções do PGBL vs CDB (demo/premium)
+│   │       └── investimentos.js # Funções de investimentos (demo/premium)
 │   └── images/               # Imagens e recursos visuais
 ├── auth/                     # Sistema de autenticação leve
 ├── blog/                     # Blog para SEO e atração de leads
@@ -78,8 +83,10 @@ Até o momento, foram implementados os seguintes arquivos principais:
 - **auth/login_process.php**: Processamento do login
 - **auth/register.php**: Página de cadastro
 - **calculadoras/index.php**: Página índice das calculadoras
-- **calculadoras/demo/simulador.php**: Versão demo do simulador educacional
-- **calculadoras/premium/simulador.php**: Versão premium do simulador educacional
+- **calculadoras/demo/simulador.php**: Versão demo do simulador educacional (implementado)
+- **calculadoras/premium/simulador.php**: Versão premium do simulador educacional (implementado)
+- **assets/js/calculadoras/simulador.js**: Funções compartilhadas entre versões demo e premium do simulador (implementado)
+- **assets/js/calculadoras/chart-helpers.js**: Funções auxiliares para visualização de gráficos (implementado)
 - **api/hotmart_webhook.php**: Endpoint para gerenciamento de licenças via Hotmart
 
 ### Próximos Passos
@@ -92,7 +99,9 @@ Até o momento, foram implementados os seguintes arquivos principais:
 2. **Fase de Desenvolvimento PHP**
    - [x] Implementar sistema de autenticação leve
    - [x] Desenvolver middlewares de verificação de acesso
-   - [ ] Adaptar calculadoras para versões demo e premium (Simulador scaffolded)
+   - [x] Adaptar calculadora Simulador Educacional (versões demo e premium)
+   - [ ] Adaptar calculadora PGBL vs CDB (versões demo e premium)
+   - [ ] Adaptar calculadora Investimentos (versões demo e premium)
    - [ ] Implementar integração Hotmart/Amazon (Webhook endpoint created)
 
 3. **Fase de Banco de Dados**
@@ -126,6 +135,7 @@ O sistema foi projetado com conformidade LGPD em mente, coletando apenas o míni
 
 ## Atualizações Recentes
 
+- **28/04/2025**: Implementação completa do Simulador Educacional (demo/premium) com Chart.js
 - **28/04/2025**: Implementação de calculadoras demo/premium e webhook Hotmart
 - **28/04/2025**: Implementação da estrutura básica do projeto e arquivos principais
 - **27/04/2025**: Criação do repositório e definição da arquitetura
@@ -137,7 +147,7 @@ O sistema foi projetado com conformidade LGPD em mente, coletando apenas o míni
 
 Para os próximos passos, o foco deve ser:
 
-1. - [ ] Adaptar calculadoras para versões demo e premium (Simulador scaffolded)
+1. - [ ] Adaptar calculadoras PGBL vs CDB e Investimentos para versões demo e premium
 2. - [ ] Implementar integração Hotmart/Amazon (Webhook endpoint created)
 3. - [ ] Desenvolver a funcionalidade de blog para SEO
 4. - [ ] Finalizar o sistema de autenticação e perfil de usuário
