@@ -1,274 +1,320 @@
 <?php
 /**
  * Simulador Educacional (Demo)
- * Versão demonstrativa do simulador de investimentos em renda fixa
+ * Versão demonstrativa limitada a 12 meses de simulação
  * 
- * Esta versão possui limitações estratégicas:
- * - Período máximo de 12 meses
- * - Sem opção de inflação variável
- * - Interface simplificada sem exportação de resultados
+ * @author Luaraujo Premium 2025
+ * @version 1.0
  */
+
+// Carregar dependências
 require_once '../../includes/functions.php';
+require_once '../../config/config.php';
 
+// Definir variáveis da página
 $page_title = "Simulador Educacional (Demo) | Luaraujo";
-$page_description = "Simule investimentos em renda fixa com CDI para períodos de até 12 meses.";
+$page_description = "Simule investimentos em renda fixa com período limitado a 12 meses.";
 
-// Valor atual do CDI (seria atualizado via API em produção)
-$cdi_atual = 13.65;
-
+// Incluir cabeçalho
 include '../../includes/header.php';
 ?>
 
 <div class="container py-5">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="display-5 fw-bold">Simulador Educacional (Demo)</h1>
-            <p class="lead">Simule investimentos em renda fixa e veja o impacto da rentabilidade ao longo do tempo.</p>
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle-fill me-2"></i>
-                Taxa CDI atual: <strong><?php echo number_format($cdi_atual, 2, ',', '.'); ?>% ao ano</strong>
-                <small class="d-block mt-1">Valores atualizados em <?php echo date('d/m/Y'); ?></small>
-            </div>
-        </div>
+    <!-- Cabeçalho da página -->
+    <div class="hero-section text-center mb-5 p-4">
+        <h1 class="display-5 fw-bold">Simulador Educacional <i class="fas fa-calculator"></i></h1>
+        <p class="lead mb-0">Versão demonstrativa limitada a 12 meses de simulação</p>
+        <div class="badge bg-warning text-dark mt-2 p-2">VERSÃO DEMO</div>
     </div>
-
+    
     <div class="row">
         <div class="col-lg-8">
-            <!-- Formulário da calculadora -->
-            <form id="calculator-form" class="card shadow-sm p-4 mb-4">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="initial" class="form-label">Valor Inicial (R$)</label>
-                        <div class="input-group">
-                            <span class="input-group-text">R$</span>
-                            <input type="number" class="form-control" id="initial" name="initial" min="100" step="100" value="1000" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="months" class="form-label">Período (meses)</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control" id="months" name="months" min="1" max="12" value="6" required>
-                            <span class="input-group-text">meses</span>
-                        </div>
-                        <div class="form-text text-muted">Versão demo limitada a 12 meses</div>
+            <!-- Conceitos básicos de investimentos -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">Conceitos Básicos de Investimentos <i class="fas fa-book"></i></h3>
+                </div>
+                <div class="card-body">
+                    <div id="tipsContent">
+                        <ul>
+                            <li><strong>Juros Compostos:</strong> São os juros que incidem não apenas sobre o <i>capital inicial</i>, mas também sobre os juros acumulados em períodos anteriores. É o chamado "juros sobre juros".</li>
+                            <li><strong>CDI (Certificado de Depósito Interbancário):</strong> É uma <i>taxa de referência</i> no mercado financeiro brasileiro, muito utilizada para remunerar investimentos de <strong>renda fixa</strong>.</li>
+                            <li><strong>Renda Fixa vs Renda Variável:</strong> <strong>Renda fixa</strong> tem retornos mais previsíveis e menor risco, enquanto <strong>renda variável</strong> pode ter maiores retornos mas com maior risco.</li>
+                            <li><strong>Inflação:</strong> Aumento generalizado dos preços que reduz o <i>poder de compra</i> do dinheiro ao longo do tempo.</li>
+                        </ul>
                     </div>
                 </div>
+            </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="rate_type" class="form-label">Tipo de Taxa</label>
-                        <select class="form-select" id="rate_type" name="rate_type">
-                            <option value="cdi" selected>CDI</option>
-                            <option value="cdi_percent">% do CDI</option>
-                            <option value="fixed">Taxa Fixa</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="rate" class="form-label">Taxa (%)</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control" id="rate" name="rate" min="0.1" step="0.1" value="100" required>
-                            <span class="input-group-text">%</span>
-                        </div>
-                        <div class="form-text" id="rate_description">100% do CDI (<?php echo number_format($cdi_atual, 2, ',', '.'); ?>% a.a.)</div>
-                    </div>
+            <!-- Formulário de simulação -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">Parâmetros da Simulação <i class="fas fa-sliders-h"></i></h3>
                 </div>
-
-                <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-primary">Calcular</button>
-                </div>
-            </form>
-
-            <!-- Resultados -->
-            <div id="results" class="card shadow-sm p-4 d-none">
-                <h2 class="h4 mb-4">Resultados da Simulação</h2>
-                
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="card h-100 bg-light">
-                            <div class="card-body">
-                                <h5 class="card-title">Valor Inicial</h5>
-                                <p class="card-text fw-bold fs-4" id="result-initial">R$ 0,00</p>
+                <div class="card-body">
+                    <form id="simulador-form">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="valorInicial" class="form-label">Valor Inicial (R$):</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                    <input type="number" class="form-control" id="valorInicial" min="0" step="100" value="1000" required>
+                                </div>
+                                <small class="text-muted">Montante inicial a ser investido</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="aporteMensal" class="form-label">Aporte Mensal (R$):</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                    <input type="number" class="form-control" id="aporteMensal" min="0" step="100" value="500" required>
+                                </div>
+                                <small class="text-muted">Valor a ser investido mensalmente</small>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card h-100 bg-success text-white">
-                            <div class="card-body">
-                                <h5 class="card-title">Valor Final</h5>
-                                <p class="card-text fw-bold fs-4" id="result-final">R$ 0,00</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="tipoRendimento" class="form-label">Tipo de Rendimento:</label>
+                                <select class="form-select" id="tipoRendimento" required>
+                                    <option value="fixa">Taxa Fixa</option>
+                                    <option value="cdi">Taxa do CDI</option>
+                                </select>
+                                <small class="text-muted">Escolha entre uma taxa fixa ou CDI</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="prazo" class="form-label">Prazo (meses):</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                    <input type="number" class="form-control" id="prazo" min="1" max="12" value="12" required>
+                                </div>
+                                <small class="text-muted">Limitado a 12 meses na versão demo</small>
                             </div>
                         </div>
+                        
+                        <div id="taxaFixaGroup" class="mb-3">
+                            <label for="taxaFixa" class="form-label">Taxa Fixa Mensal (%):</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-percentage"></i></span>
+                                <input type="number" class="form-control" id="taxaFixa" step="0.01" min="0" value="0.8">
+                            </div>
+                            <small class="text-muted">Taxa de rendimento mensal</small>
+                        </div>
+                        
+                        <div id="cdiGroup" style="display: none;" class="mb-3">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="taxaCDI" class="form-label">Taxa CDI Anual (%):</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-percentage"></i></span>
+                                        <input type="number" class="form-control" id="taxaCDI" step="0.01" min="0" value="13.15">
+                                    </div>
+                                    <small class="text-muted">Taxa do CDI anual</small>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="percentualCDIComImposto" class="form-label">% do CDI (Com IR):</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-percentage"></i></span>
+                                        <input type="number" class="form-control" id="percentualCDIComImposto" step="1" min="0" max="200" value="100">
+                                    </div>
+                                    <small class="text-muted">% do CDI para ativos com IR</small>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="percentualCDISemImposto" class="form-label">% do CDI (Sem IR):</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-percentage"></i></span>
+                                        <input type="number" class="form-control" id="percentualCDISemImposto" step="1" min="0" max="200" value="93">
+                                    </div>
+                                    <small class="text-muted">% do CDI para ativos isentos de IR</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="inflacao" class="form-label">Inflação Anual Estimada (%):</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-chart-line"></i></span>
+                                <input type="number" class="form-control" id="inflacao" step="0.1" min="0" value="4.5">
+                            </div>
+                            <small class="text-muted">Estimativa de inflação anual</small>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="goalAmount" class="form-label">Meta Financeira (R$):</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-bullseye"></i></span>
+                                    <input type="number" class="form-control" id="goalAmount" min="0" step="1000" value="10000">
+                                </div>
+                                <small class="text-muted">Valor que deseja acumular</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="goalYears" class="form-label">Prazo para Meta (anos):</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-hourglass-half"></i></span>
+                                    <input type="number" class="form-control" id="goalYears" min="1" step="1" value="1">
+                                </div>
+                                <small class="text-muted">Prazo para atingir a meta</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="button" onclick="calcularRentabilidadeDemo()" class="btn btn-primary btn-lg">
+                                <i class="fas fa-calculator me-2"></i> Calcular Simulação
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Resultados da simulação -->
+            <div id="results" class="card mb-4" style="display: none;">
+                <div class="card-header bg-success text-white">
+                    <h3 class="h5 mb-0">Resultados da Simulação <i class="fas fa-chart-line"></i></h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>Valor Inicial:</th>
+                                    <td>R$ <span id="resultValorInicial"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Aporte Mensal:</th>
+                                    <td>R$ <span id="resultAporteMensal"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Prazo:</th>
+                                    <td><span id="resultPrazo"></span> meses</td>
+                                </tr>
+                                <tr>
+                                    <th>Taxa de Rendimento:</th>
+                                    <td><span id="resultTaxaRendimento"></span>% ao mês</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>Valor Final:</th>
+                                    <td>R$ <span id="resultValorFinal"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Ganho Total:</th>
+                                    <td>R$ <span id="resultGanhoTotal"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Inflação Acumulada:</th>
+                                    <td><span id="resultInflacaoAcumulada"></span>%</td>
+                                </tr>
+                                <tr>
+                                    <th>Valor Final Ajustado (Inflação):</th>
+                                    <td>R$ <span id="resultValorFinalAjustado"></span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container mt-4">
+                        <canvas id="chartSimulacao"></canvas>
                     </div>
                 </div>
-                
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Comparações de investimentos -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">Comparações <i class="fas fa-balance-scale"></i></h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Rendimento Bruto</th>
-                                <th>Rendimento (%)</th>
-                                <th>Rendimento Mensal</th>
+                                <th>Investimento</th>
+                                <th>Valor Final</th>
+                                <th>Ganho Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td id="result-earnings">R$ 0,00</td>
-                                <td id="result-percentage">0%</td>
-                                <td id="result-monthly-rate">0% a.m.</td>
+                                <td>Poupança</td>
+                                <td id="comparacaoPoupancaValorFinal">-</td>
+                                <td id="comparacaoPoupancaGanhoTotal">-</td>
+                            </tr>
+                            <tr>
+                                <td>CDB</td>
+                                <td id="comparacaoCDBValorFinal">-</td>
+                                <td id="comparacaoCDBGanhoTotal">-</td>
+                            </tr>
+                            <tr>
+                                <td>LCI/LCA</td>
+                                <td id="comparacaoLCILCAValorFinal">-</td>
+                                <td id="comparacaoLCILCAGanhoTotal">-</td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
-                
-                <div class="alert alert-info mt-3">
-                    <i class="bi bi-info-circle me-2"></i> Esta é uma versão simplificada. Para simulações mais avançadas com:
-                    <ul class="mt-2 mb-0">
-                        <li>Períodos mais longos (até 30 anos)</li>
-                        <li>Ajuste pela inflação</li>
-                        <li>Cálculo de impostos</li>
-                        <li>Aportes mensais</li>
-                        <li>Gráficos detalhados</li>
-                    </ul>
+                    
+                    <div class="chart-container">
+                        <canvas id="chartComparacoes"></canvas>
+                    </div>
+                    
                     <div class="mt-3">
-                        <a href="<?php echo hotmart_product_link(); ?>" class="btn btn-success btn-sm" target="_blank">
-                            Acessar Versão Premium
-                        </a>
+                        <h4 class="h6">Laudo Comparativo <i class="fas fa-file-alt"></i></h4>
+                        <p id="laudoComparativo" class="small">Execute a simulação para ver o laudo comparativo.</p>
+                        <p id="laudoMeta" class="small">Preencha os campos de meta financeira para ver a análise.</p>
+                        <p id="laudoPercentualCDB" class="small">Execute a simulação para ver a equivalência de rendimentos.</p>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-4">
-            <!-- Informações Premium -->
-            <div class="card bg-light shadow-sm p-4">
-                <h3 class="h5 mb-3">Versão Premium Inclui:</h3>
-                <ul class="list-group list-group-flush mb-4">
-                    <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i> Simulações para períodos ilimitados</li>
-                    <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i> Opções de inflação variável</li>
-                    <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i> Exportação de resultados em PDF</li>
-                    <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i> Comparação entre diferentes investimentos</li>
-                    <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i> Gráficos detalhados de projeção</li>
-                    <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i> Cálculo de impostos personalizados</li>
-                    <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i> Salvar simulações para referência futura</li>
-                </ul>
-                <div class="d-grid">
-                    <a href="<?php echo hotmart_product_link(); ?>" class="btn btn-success btn-lg" target="_blank">
-                        Obter Versão Premium
+            
+            <!-- Banner promoção versão premium -->
+            <div class="card mb-4 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">Versão Premium <i class="fas fa-crown"></i></h3>
+                </div>
+                <div class="card-body">
+                    <h4 class="h6 mb-3">Desbloqueie Todas as Funcionalidades!</h4>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Simulações para períodos ilimitados</li>
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Opções de inflação variável</li>
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Exportação de resultados em PDF</li>
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Comparações detalhadas entre investimentos</li>
+                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Análise personalizada de metas financeiras</li>
+                    </ul>
+                    <a href="/produtos/premium?ref=simulador-demo" class="btn btn-success btn-lg d-block">
+                        <i class="fas fa-unlock me-2"></i> Obter Acesso Premium
                     </a>
                 </div>
-            </div>
-            
-            <!-- Como funciona -->
-            <div class="card shadow-sm p-4 mt-4">
-                <h3 class="h5 mb-3">Como funciona?</h3>
-                <p>O Simulador Educacional permite calcular o rendimento de investimentos em renda fixa com base em:</p>
-                <ul class="mb-0">
-                    <li>CDI (Certificado de Depósito Interbancário)</li>
-                    <li>Taxa fixa personalizada</li>
-                    <li>Percentual do CDI</li>
-                </ul>
-                <hr>
-                <p class="mb-0"><small>Valores apenas para fins educacionais. Consulte um profissional de investimentos para decisões financeiras.</small></p>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/assets/js/calculadoras/chart-helpers.js"></script>
+<script src="/assets/js/calculadoras/simulador.js"></script>
 <script>
-// Lógica JavaScript aprimorada para a calculadora demo
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('calculator-form');
-    const resultsDiv = document.getElementById('results');
-    const rateType = document.getElementById('rate_type');
-    const rateInput = document.getElementById('rate');
-    const rateDescription = document.getElementById('rate_description');
-    const cdiRate = <?php echo $cdi_atual; ?>;
-    
-    // Atualizar descrição da taxa ao mudar o tipo ou valor
-    function updateRateDescription() {
-        const selectedType = rateType.value;
-        const rateValue = parseFloat(rateInput.value);
-        
-        let description = '';
-        switch(selectedType) {
-            case 'cdi':
-                description = '100% do CDI (' + cdiRate.toFixed(2).replace('.', ',') + '% a.a.)';
-                rateInput.value = 100;
-                rateInput.disabled = true;
-                break;
-            case 'cdi_percent':
-                description = rateValue + '% do CDI (' + ((rateValue/100) * cdiRate).toFixed(2).replace('.', ',') + '% a.a.)';
-                rateInput.disabled = false;
-                break;
-            case 'fixed':
-                description = rateValue + '% ao ano';
-                rateInput.disabled = false;
-                break;
+    // Inicialização específica para versão demo
+    document.addEventListener('DOMContentLoaded', function() {
+        // Limitar campo de prazo na versão demo
+        const prazoInput = document.getElementById('prazo');
+        if (prazoInput) {
+            prazoInput.max = 12;
+            prazoInput.setAttribute('max', '12');
         }
         
-        rateDescription.textContent = description;
-    }
-    
-    rateType.addEventListener('change', updateRateDescription);
-    rateInput.addEventListener('input', updateRateDescription);
-    
-    // Inicializar descrição
-    updateRateDescription();
-    
-    // Processar formulário
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
+        // Configurar mudança de exibição dos campos de taxa
+        document.getElementById('tipoRendimento').addEventListener('change', mostrarCamposTaxaComBaseNoTipo);
         
-        // Obter valores do formulário
-        const initialValue = parseFloat(document.getElementById('initial').value);
-        const months = parseInt(document.getElementById('months').value);
-        const selectedRateType = rateType.value;
-        const rateValue = parseFloat(rateInput.value);
-        
-        // Calcular taxa anual
-        let annualRate = 0;
-        switch(selectedRateType) {
-            case 'cdi':
-                annualRate = cdiRate;
-                break;
-            case 'cdi_percent':
-                annualRate = cdiRate * (rateValue / 100);
-                break;
-            case 'fixed':
-                annualRate = rateValue;
-                break;
-        }
-        
-        // Converter taxa anual para mensal
-        const monthlyRate = Math.pow(1 + (annualRate / 100), 1/12) - 1;
-        
-        // Calcular montante final usando juros compostos
-        const finalValue = initialValue * Math.pow(1 + monthlyRate, months);
-        const earnings = finalValue - initialValue;
-        const earningsPercentage = (earnings / initialValue) * 100;
-        
-        // Exibir resultados
-        document.getElementById('result-initial').textContent = formatCurrency(initialValue);
-        document.getElementById('result-final').textContent = formatCurrency(finalValue);
-        document.getElementById('result-earnings').textContent = formatCurrency(earnings);
-        document.getElementById('result-percentage').textContent = earningsPercentage.toFixed(2).replace('.', ',') + '%';
-        document.getElementById('result-monthly-rate').textContent = (monthlyRate * 100).toFixed(2).replace('.', ',') + '% a.m.';
-        
-        // Mostrar div de resultados
-        resultsDiv.classList.remove('d-none');
-        
-        // Scroll para resultados
-        resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        // Mostrar campos iniciais
+        mostrarCamposTaxaComBaseNoTipo();
     });
-    
-    // Função auxiliar para formatação de moeda
-    function formatCurrency(value) {
-        return 'R$ ' + value.toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    }
-});
 </script>
 
-<?php include '../../includes/footer.php'; ?>
+<?php
+// Incluir rodapé
+include '../../includes/footer.php';
+?>
